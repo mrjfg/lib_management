@@ -263,28 +263,31 @@ MODE* BORR_MENU::loop(){
     string isbn;
     std::stringstream str4sql;
     int   operate;
+    int   status;
     std::cout << "\x1B[2J\x1B[H";
     cout <<endl;
-    if(globalusr.borrnum >=10){                             //首先判断个人信息中是否借书超过10本
+    if(globalusr.borrnum >=10){                                                                                 //首先判断个人信息中是否借书超过10本
         cout << "you have borrowde 10 books"<<endl;
         cout <<endl;
         cout <<"enter any key to return "<<endl;
         system("pause");
-        pMode = &mode_main;                                  //超过10本，则提示并返回主界面
+        pMode = &mode_main;                                                                                     //超过10本，则提示并返回主界面
     }
     else {
-        cout <<setw(50)<<"you have borrowde "<<globalusr.borrnum<<" book(s)"<<endl;             //提示借过几本书
-        cout <<setw(50)<<"plase enter ISBN "<<endl;                                             //接收ISBN
+        cout <<setw(50)<<"you have borrowde "<<globalusr.borrnum<<" book(s)"<<endl;                             //提示借过几本书
+        cout <<setw(50)<<"plase enter ISBN "<<endl;                                                             //接收ISBN
         cin >>isbn;
 
-        cout << setw(30) <<"Author"<< setw(20) <<"Isbn"<< setw(20) <<"Class"<< setw(20) <<"Statue"<< setw(20) <<"Title\n";
 
-        str4sql << "SELECT * FROM `lib_management`.`book` WHERE `isbn` = '"<<isbn<<"' ;";        //拼接sql语句，查询ISBN对应书籍
-        switch (db.serch4borrowSQL(str4sql.str()))
+        str4sql << "SELECT * FROM `lib_management`.`book` WHERE `isbn` = '"<<isbn<<"' ;";                       //拼接sql语句，查询ISBN对应书籍
+        status = db.serch4borrowSQL(str4sql.str());
+        switch (status)
         {
             case 1:
                 /* code */
-                cout << endl<< endl; //查询成功，显示书籍信息，提示用户检查信息是否正确，提示继续借书或者返回
+                cout << setw(30) <<"Author"<< setw(20) <<"Isbn"<< setw(20) <<"Class"<< setw(20) <<"Statue"<< setw(20) <<"Title\n";
+
+                cout << endl<< endl;                                                            //查询成功，显示书籍信息，提示用户检查信息是否正确，提示继续借书或者返回
                 cout << setw(60) << "place chack information for book" << endl;
                 cout << setw(50) << "enter 1 to borrow" << endl;
                 cout << setw(50) << "enter 2 to cancel" << endl;
@@ -301,17 +304,24 @@ MODE* BORR_MENU::loop(){
                 }
                 break;
             case 2:
-                cout <<setw(50) <<"this book is borrowed by others!"<<endl;                                      //查询失败，图书馆没有这本书
-                system("pause");
+                cout << setw(30) <<"Author"<< setw(20) <<"Isbn"<< setw(20) <<"Class"<< setw(20) <<"Statue"<< setw(20) <<"Title\n";
+                cout << endl<< endl;                                                            //查询成功，显示书籍信息，提示用户检查信息是否正确，提示继续借书或者返回
+                cout << setw(60) << "place chack information for book" << endl;
+                cout << setw(50) << "enter 1 to borrow" << endl;
+                cout << setw(50) << "enter 2 to cancel" << endl;
+                cout <<setw(50) <<"this book is borrowed by others!"<<endl;                                      //查询成功，但图书被借走
+                cin >>isbn;
                 pMode = &mode_main;
                 break;
             case 3:
                 cout <<setw(50) <<"There is no library or this book"<<endl;                                      //查询失败，图书馆没有这本书
-                system("pause");
+                cin >>isbn;
                 pMode = &mode_main;
+                break;
             default:
+                cout <<"return "<<status;
                 cout << "error";
-                system("pause");
+                cin >>isbn;
                 break;
         }
     }

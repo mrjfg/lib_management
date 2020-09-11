@@ -12,8 +12,8 @@ MyDB db;
     
 MyDB::MyDB()
 {
-    mysql=mysql_init(NULL);   //初始化数据库连接变量
-    if (0 == mysql_options(mysql, MYSQL_SET_CHARSET_NAME, "utf8"))//设置字符集
+    mysql=mysql_init(NULL);                                         //初始化数据库连接变量
+    if (0 == mysql_options(mysql, MYSQL_SET_CHARSET_NAME, "utf8"))  //设置字符集
     {
         cout << "设置字符集成功\n\n" << endl;
     }
@@ -24,9 +24,9 @@ MyDB::MyDB()
     }
 }
 
-MyDB::~MyDB()                                               //这个析构函数用来关闭数据库连接
+MyDB::~MyDB()                                                       //这个析构函数用来关闭数据库连接
 {
-    if(mysql!=NULL)  //关闭数据连接
+    if(mysql!=NULL)                                                 //关闭数据连接
     {
         mysql_close(mysql);
     }
@@ -47,7 +47,7 @@ bool MyDB::initDB(string host,string user,string passwd,string db_name)
     return true;  
 }
 
-int MyDB::serch4borrowSQL(string sql )
+int MyDB::serch4borrowSQL(string sql )                      //查询图书馆是否有这本书，是否被借走
 {
     stringstream s;
     //mysql_query()执行成功返回0,执行失败返回非0值。
@@ -56,31 +56,36 @@ int MyDB::serch4borrowSQL(string sql )
         cout<<"Query Error: "<<mysql_error(mysql);
         return 3;
     }
-    else // 查询成功
+    else                                                    //查询成功
     {
-        result = mysql_store_result(mysql);  //获取结果集
-        if (result)  // 返回了结果集
+        result = mysql_store_result(mysql);                 //获取结果集
+        if (result)                                         //返回了结果集
         {
-           int  num_fields = mysql_num_fields(result);   //获取结果集中总共的字段数，即列数
-           int  num_rows=mysql_num_rows(result);       //获取结果集中总共的行数
+           int  num_fields = mysql_num_fields(result);      //获取结果集中总共的字段数，即列数
+           int  num_rows=mysql_num_rows(result);            //获取结果集中总共的行数
 
-           for(int i=0;i<num_rows;i++) //输出每一行
+           for(int i=0;i<num_rows;i++)                      //输出每一行
             {
                 //获取下一行数据
                 row=mysql_fetch_row(result);
                 
-                if(row[3] == 0)
-                    return 2;                           //不在图书馆，已经被借走
-                else return 1;
-                for(int j=0;j<num_fields;j++)  //输出每一字段
+                for(int j=0;j<num_fields;j++)               //输出每一字段
                 {
                     cout<<row[j]<<"\t\t";
                 }
                 cout<<endl;
+                if(row[3] == 0)
+                    return 2;                               //不在图书馆，已经被借走
+                else 
+                    return 1;
+                
             }
 
         }
+        else 
+            return 3;
     }
+    return 3;
 
 }
 bool MyDB::exeSQL(string sql , MODE::User *user)
@@ -92,15 +97,15 @@ bool MyDB::exeSQL(string sql , MODE::User *user)
         cout<<"Query Error: "<<mysql_error(mysql);
         return false;
     }
-    else // 查询成功
+    else                                                // 查询成功
     {
-        result = mysql_store_result(mysql);  //获取结果集
+        result = mysql_store_result(mysql);             //获取结果集
         if (result)  // 返回了结果集
         {
-           int  num_fields = mysql_num_fields(result);   //获取结果集中总共的字段数，即列数
-           int  num_rows=mysql_num_rows(result);       //获取结果集中总共的行数
+           int  num_fields = mysql_num_fields(result);  //获取结果集中总共的字段数，即列数
+           int  num_rows=mysql_num_rows(result);        //获取结果集中总共的行数
 
-           for(int i=0;i<num_rows;i++) //输出每一行
+           for(int i=0;i<num_rows;i++)                  //输出每一行
             {
                 //获取下一行数据
                 row=mysql_fetch_row(result);
@@ -112,18 +117,12 @@ bool MyDB::exeSQL(string sql , MODE::User *user)
                 user->password    = row[3];
                 s << row[4] ;
                 s >> user->borrnum ;
-
-                // for(int j=0;j<num_fields;j++)  //输出每一字段
-                // {
-                //     cout<<row[j]<<"\t\t";
-                // }
-                // cout<<endl;
             }
 
         }
         else  // result==NULL
         {
-            if(mysql_field_count(mysql) == 0)   //代表执行的是update,insert,delete类的非查询语句
+            if(mysql_field_count(mysql) == 0)           //代表执行的是update,insert,delete类的非查询语句
             {
                 // (it was not a SELECT)
                 int num_rows = mysql_affected_rows(mysql);  //返回update,insert,delete影响的行数
@@ -147,20 +146,20 @@ bool MyDB::exeSQL(string sql)
         cout<<"Query Error: "<<mysql_error(mysql);
         return false;
     }
-    else // 查询成功
+    else                                                // 查询成功
     {
-        result = mysql_store_result(mysql);  //获取结果集
-        if (result)  // 返回了结果集
+        result = mysql_store_result(mysql);             //获取结果集
+        if (result)                                     // 返回了结果集
         {
-           int  num_fields = mysql_num_fields(result);   //获取结果集中总共的字段数，即列数
-           int  num_rows=mysql_num_rows(result);       //获取结果集中总共的行数
-           for(int i=0;i<num_rows;i++) //输出每一行
+           int  num_fields = mysql_num_fields(result);  //获取结果集中总共的字段数，即列数
+           int  num_rows=mysql_num_rows(result);        //获取结果集中总共的行数
+           for(int i=0;i<num_rows;i++)                  //输出每一行
             {
                 //获取下一行数据
                 row=mysql_fetch_row(result);
                 if(row<0) break;
 
-                for(int j=0;j<num_fields;j++)  //输出每一字段
+                for(int j=0;j<num_fields;j++)           //输出每一字段
                 {
                     cout<<setw(30)<< row[j];
                 }
@@ -170,7 +169,7 @@ bool MyDB::exeSQL(string sql)
         }
         else  // result==NULL
         {
-            if(mysql_field_count(mysql) == 0)   //代表执行的是update,insert,delete类的非查询语句
+            if(mysql_field_count(mysql) == 0)           //代表执行的是update,insert,delete类的非查询语句
             {
                 // (it was not a SELECT)
                 int num_rows = mysql_affected_rows(mysql);  //返回update,insert,delete影响的行数
@@ -192,10 +191,10 @@ bool MyDB::serchRecSQL(string sql , MYSQL_RES **bresult){
         cout<<"Query Error: "<<mysql_error(mysql);
         return false;
     }
-    else // 查询成功
+    else                                    // 查询成功
     {
-        result = mysql_store_result(mysql);  //获取结果集
-        if (result)  // 返回了结果集
+        result = mysql_store_result(mysql); //获取结果集
+        if (result)                         // 返回了结果集
         {
            *bresult = result;
         }
