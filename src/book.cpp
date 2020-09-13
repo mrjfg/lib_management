@@ -36,7 +36,7 @@ int book::saveBook(){
        head = new Node(init);
   }
   //从头插入一个节点
-  void BookList::insert(BookList::Blist* d)
+  void BookList::insert(Blist* d)
   {
       Node *p = new Node(d);
       p->next = head->next;
@@ -50,7 +50,7 @@ int book::saveBook(){
       }
   }
   //在d位置之前插入d1
-  void BookList::insert_pos(BookList::Blist* d,BookList::Blist* d1)
+  void BookList::insert_pos(Blist* d,Blist* d1)
   {
       Node * p = find(d);
       Node * q = new Node(d1);
@@ -59,7 +59,7 @@ int book::saveBook(){
   }
   
   //删除
-  void BookList::erase(BookList::Blist* d)
+  void BookList::erase(Blist* d)
   {
       Node * p = find(d);
       //因为p是上一个节点的位置，用q来保存
@@ -73,7 +73,7 @@ int book::saveBook(){
  }
  
  //修改指定数据
- void BookList::updata(BookList::Blist* d,BookList::Blist* d1)
+ void BookList::updata(Blist* d,Blist* d1)
  {
      Node * p = find(d);
      p->next->data = d1;

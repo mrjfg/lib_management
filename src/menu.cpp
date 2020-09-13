@@ -5,6 +5,8 @@
 #include "sstream"
 #include "iomanip"
 #include "stdio.h"
+
+
 #include<mysql/mysql.h>
 using namespace std;
 
@@ -23,7 +25,6 @@ static LOGIN_MENU      mode_login;
 static BORR_MENU       mode_borr;
 static MODE*           pMode = &mode_login;           //设置登录界面为第一个界面
 
-BookList::Blist borrlist;                             //定义借书记录结构体，用来插入链表
 
 BookList list;                                        //新建链表类    同时初始化链表（在book.h中Booklist类写的是，创建同时初始化)
 
@@ -40,6 +41,7 @@ MODE* MODE::returnMode(){
  *     timr     2020.09.11:2:26
 ***********************************/
 void serchBorrRecode(){
+    Blist borrlist;                             //定义借书记录结构体，用来插入链表
     stringstream str4sql;
     MYSQL_RES*   sresult;
     stringstream s;
@@ -61,9 +63,12 @@ void serchBorrRecode(){
                 s << row[3];                                                                                //将bit转化为字符串
                 s >> borrlist.retuenif;
                 list.insert(&borrlist); 
+                //cout <<borrlist.isbn;
                 list.print();                                                                               //将查询到的数据循环插入到链表之中
+
                 cout << endl;                                                                               //打印链表的内容（也就是一个人所借的所有书）
             }
+
         }
     }
     else {
@@ -90,7 +95,7 @@ MODE* LOGIN_MENU::loop(){
     if(db.exeSQL(str4sql.str(), &usr)){                                                         //这里需要判断读出来的用户数据是否为空，查询数据时语句没错会返回真
         if(usr.password==""){
             cout <<setw(50)<<""<<"phone number error"<<endl;
-            while(cin.get()!=EOF);
+            cin>>usr.phone; 
             pMode = &mode_login;                            //不一致则提示密码错误，返回登录界面
             return pMode;
         }
@@ -148,6 +153,7 @@ MODE* MAIN_MENU::loop(){
     cout <<endl;
     cout <<setw(30)<<""<<"\t          Search by category   6"<<endl;
     cout <<endl;
+    cout <<setw(30)<<""<<"\t------------------------------------------"<<endl;
     cout <<setw(30)<<""<<"\t        $$ Personal center $$  7"<<endl;
     cout <<endl;
     cout <<setw(40)<<""<<"plase enter your operate :";
@@ -263,7 +269,6 @@ MODE* BORR_MENU::loop(){
     string isbn;
     std::stringstream str4sql;
     int   operate;
-    int   status;
     std::cout << "\x1B[2J\x1B[H";
     cout <<endl;
     if(globalusr.borrnum >=10){                                                                                 //首先判断个人信息中是否借书超过10本
@@ -274,14 +279,13 @@ MODE* BORR_MENU::loop(){
         pMode = &mode_main;                                                                                     //超过10本，则提示并返回主界面
     }
     else {
-        cout <<setw(50)<<"you have borrowde "<<globalusr.borrnum<<" book(s)"<<endl;                             //提示借过几本书
+        cout <<setw(50)<<"you have borrowed "<<globalusr.borrnum<<" book(s)"<<endl;                             //提示借过几本书
         cout <<setw(50)<<"plase enter ISBN "<<endl;                                                             //接收ISBN
         cin >>isbn;
 
 
         str4sql << "SELECT * FROM `lib_management`.`book` WHERE `isbn` = '"<<isbn<<"' ;";                       //拼接sql语句，查询ISBN对应书籍
-        status = db.serch4borrowSQL(str4sql.str());
-        switch (status)
+        switch (db.serch4borrowSQL(str4sql.str()))
         {
             case 1:
                 /* code */
@@ -296,7 +300,7 @@ MODE* BORR_MENU::loop(){
                 {
                     case 1:
                         /* code */
-
+                        updateSQL(isbn);    
                         break;
 
                     default:
@@ -305,10 +309,8 @@ MODE* BORR_MENU::loop(){
                 break;
             case 2:
                 cout << setw(30) <<"Author"<< setw(20) <<"Isbn"<< setw(20) <<"Class"<< setw(20) <<"Statue"<< setw(20) <<"Title\n";
-                cout << endl<< endl;                                                            //查询成功，显示书籍信息，提示用户检查信息是否正确，提示继续借书或者返回
-                cout << setw(60) << "place chack information for book" << endl;
-                cout << setw(50) << "enter 1 to borrow" << endl;
-                cout << setw(50) << "enter 2 to cancel" << endl;
+                cout << endl<< endl;                                                            
+                
                 cout <<setw(50) <<"this book is borrowed by others!"<<endl;                                      //查询成功，但图书被借走
                 cin >>isbn;
                 pMode = &mode_main;
@@ -319,16 +321,81 @@ MODE* BORR_MENU::loop(){
                 pMode = &mode_main;
                 break;
             default:
-                cout <<"return "<<status;
                 cout << "error";
                 cin >>isbn;
                 break;
         }
     }
 }
+/************************************
+ *     author   rainbow
+ *     func     int to string
+ *     timr     2020.09.10
+***********************************/
+string inttostring(int in)
+{
+	stringstream ss;
+	string str;
+	ss << in;
+	ss >> str;
+	return str;
+}
+/************************************
+ *     author   rainbow
+ *     func     get time
+ *     timr     2020.09.10
+***********************************/
+int getTime( char *gtime) {
 
+    time_t tt;
+    time( &tt );
+    tt = tt + 8*3600;  // transform the time zone
+    tm* t= gmtime( &tt );
+    cout << tt << endl;
 
+    sprintf(gtime, "%d-%02d-%02d %02d:%02d:%02d\n",
+           t->tm_year + 1900,
+           t->tm_mon + 1,
+           t->tm_mday,
+           t->tm_hour,
+           t->tm_min,
+           t->tm_sec);
 
+    return 0;
+}
+/************************************
+ *     author   rainbow
+ *     func     updata database while borrowed book(s)
+ *     timr     2020.09.10
+***********************************/
+void BORR_MENU::updateSQL(string bisbn){
+    stringstream s;
+    char gtime ;
+    string sqlstr ="UPDATE book SET inlabif='0' WHERE isbn ='"+bisbn+"';";
+    db.exeSQL(sqlstr);
+
+   
+    sqlstr = "INSERT INTO record (phon,isbn,returnif) values('"+globalusr.phone+"',  \
+                    '"+bisbn+"',"+"0"+");";
+    db.exeSQL(sqlstr);
+
+    sqlstr = "UPDATE  record SET time = NOW() WHERE isbn = '"+bisbn+"'";
+    db.exeSQL(sqlstr);
+
+    s<<globalusr.borrnum+1;
+    s>>globalusr.borrnum_str;
+    sqlstr ="UPDATE usr SET borrnum = '"+globalusr.borrnum_str+"' WHERE phone \
+                    ='"+globalusr.phone+"';";
+    db.exeSQL(sqlstr);
+    getTime(&gtime);
+    s<<gtime;
+    // borrlist.isbn       = bisbn;                                                               //填充借书记录结构体
+    // borrlist.borrowtime = s.str();
+    //borrlist.retuenif = 0;
+    // list.insert(&borrlist); 
+    // list.print();
+    while(1);
+}
 
 /************************************
  *     author   rainbow

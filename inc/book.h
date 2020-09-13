@@ -25,13 +25,7 @@ protected:
     std::string author;
     std::string isbn;
 };
-
-class BookList {
-      
-    public:
-        BookList(){create_List();}                                  //在新建的时候自动初始化，建立链表
-        ~BookList(){clear();}
-        typedef struct Blist                                        //此结构体用来作为链表的数据 
+typedef struct Blist                                        //此结构体用来作为链表的数据 
         {
             /* data */
             int         retuenif;
@@ -41,7 +35,13 @@ class BookList {
             std::string isbn;
             std::string bclass;
         }Blist;
-        Blist* init;
+class BookList {
+      
+    public:
+        BookList(){create_List();}                                  //在新建的时候自动初始化，建立链表
+        ~BookList(){clear();}
+        
+        
         //创建头结点
         void create_List();
         //插入函数
@@ -57,7 +57,7 @@ class BookList {
         void print();
     private:
         //节点结构
-        
+        Blist* init=NULL;
         struct Node{
             Blist* data;
             Node * next;

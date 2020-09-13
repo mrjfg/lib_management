@@ -50,6 +50,7 @@ bool MyDB::initDB(string host,string user,string passwd,string db_name)
 int MyDB::serch4borrowSQL(string sql )                      //查询图书馆是否有这本书，是否被借走
 {
     stringstream s;
+    int inlabif;
     //mysql_query()执行成功返回0,执行失败返回非0值。
     if (mysql_query(mysql,sql.c_str()))
     {
@@ -74,7 +75,9 @@ int MyDB::serch4borrowSQL(string sql )                      //查询图书馆是
                     cout<<row[j]<<"\t\t";
                 }
                 cout<<endl;
-                if(row[3] == 0)
+                s<<row[3];
+                s>>inlabif;
+                if(inlabif == 0)
                     return 2;                               //不在图书馆，已经被借走
                 else 
                     return 1;
@@ -115,6 +118,7 @@ bool MyDB::exeSQL(string sql , MODE::User *user)
                 user->phone       = row[1];
                 user->creattime   = row[2];
                 user->password    = row[3];
+                user->borrnum_str = row[4];
                 s << row[4] ;
                 s >> user->borrnum ;
             }

@@ -20,6 +20,7 @@ class MODE
             std::string phone;
             std::string creattime;
             int         borrnum;
+            std::string borrnum_str;
         }User;
 
         User usr;
@@ -76,6 +77,7 @@ class BORR_MENU : public MODE{
 
     private:
         /* data */
+        void updateSQL(std::string bisbn);
     public:
         BORR_MENU() : MODE()					{ }
         ~BORR_MENU ()                           { }
