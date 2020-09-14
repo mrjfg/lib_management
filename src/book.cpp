@@ -39,6 +39,9 @@ int book::saveBook(){
   void BookList::insert(Blist* d)
   {
       Node *p = new Node(d);
+      p->isbn = d->isbn;
+      p->retuenif =d->retuenif;
+      p->borrowtime = d->borrowtime;
       p->next = head->next;
       head->next = p;
   }
@@ -46,7 +49,7 @@ int book::saveBook(){
   void BookList::print()
   {
       for(Node * p = head->next;p;p=p->next){
-          cout << "\t\t\t"<<p->data->isbn <<"\t\t\t\t"<<p->data->borrowtime<<"\t\t\t\t\t"<<p->data->retuenif<< endl;
+          cout << "\t\t\t"<<p->isbn <<"\t\t\t\t"<<p->borrowtime<<"\t\t\t\t\t"<<p->retuenif<< endl;
       }
   }
   //在d位置之前插入d1
@@ -76,9 +79,18 @@ int book::saveBook(){
  void BookList::updata(Blist* d,Blist* d1)
  {
      Node * p = find(d);
-     p->next->data = d1;
+     p->next->isbn = d1->isbn;
  }
- 
+
+
+ int  BookList::exsit_if(Blist* d){
+     Node * p = head;
+            for(;p->next!=NULL;p=p->next){
+                if(p->next->isbn==d->isbn)
+                    return 1;
+            }
+            return 0;
+ }
  //得到链表长度
  
  

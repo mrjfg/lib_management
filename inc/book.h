@@ -25,7 +25,7 @@ protected:
     std::string author;
     std::string isbn;
 };
-typedef struct Blist                                        //此结构体用来作为链表的数据 
+struct Blist                                        //此结构体用来作为链表的数据 
         {
             /* data */
             int         retuenif;
@@ -34,7 +34,7 @@ typedef struct Blist                                        //此结构体用来
             std::string borrowtime;
             std::string isbn;
             std::string bclass;
-        }Blist;
+        };
 class BookList {
       
     public:
@@ -52,16 +52,21 @@ class BookList {
         void erase(Blist* d);
         //修改指定数据
         void updata(Blist* d,Blist* d1);
-       
+        int  exsit_if(Blist* d);                                //用来还书时校验用户输入的isbn是否在借阅列表
         //打印
         void print();
     private:
         //节点结构
         Blist* init=NULL;
         struct Node{
-            Blist* data;
+            int         retuenif;
+            std::string bookname;
+            std::string author;
+            std::string borrowtime;
+            std::string isbn;
+            std::string bclass;
             Node * next;
-            Node(Blist* d):data(d),next(NULL){}//开辟空间的同时初始化
+            Node(Blist* d):next(NULL){}//开辟空间的同时初始化
         };
         Node * head;//头节点
         //清理链表函数
@@ -79,7 +84,7 @@ class BookList {
         Node* find(Blist* d){
             Node * p = head;
             for(;p;p=p->next){
-                if(p->next->data==d)
+                if(p->next->isbn==d->isbn)
                     break;
             }
             return p;

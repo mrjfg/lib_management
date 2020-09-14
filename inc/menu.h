@@ -2,6 +2,7 @@
 #include "iostream"
 #include "sstream"
 
+void returnBookSQL();
 
 class MODE
 {
@@ -28,6 +29,34 @@ class MODE
         MODE*           mode_return		;				
 };
 
+class FIRST_MENU : public MODE{
+
+    private:
+        /* data */
+    public:
+        FIRST_MENU() : MODE()					{ }
+        ~FIRST_MENU ()                          { }
+        virtual MODE*   loop(void);
+};
+class ADMIN_LODIN : public MODE{
+
+    private:
+        /* data */
+    public:
+        ADMIN_LODIN() : MODE()					{ }
+        ~ADMIN_LODIN ()                         { }
+        virtual MODE*   loop(void);
+};
+
+class ADMIN_MENU : public MODE{
+
+    private:
+        /* data */
+    public:
+        ADMIN_MENU() : MODE()					{ }
+        ~ADMIN_MENU ()                         { }
+        virtual MODE*   loop(void);
+};
 class LOGIN_MENU : public MODE{
 
     private:
@@ -60,6 +89,19 @@ class LIST_MENU : public MODE{
     public:
         LIST_MENU() : MODE()					{ }
         ~LIST_MENU ()                           { }
+        virtual MODE*   loop(void);
+};
+
+class LIST_RECORD : public MODE{
+
+    private:
+        /* data */
+        int operate ;
+        int page ;
+        
+    public:
+        LIST_RECORD() : MODE()					{ }
+        ~LIST_RECORD ()                           { }
         virtual MODE*   loop(void);
 };
 
